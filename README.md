@@ -14,9 +14,11 @@ The Super XO Game is a dynamic and engaging implementation of the classic Tic-Ta
 •	Players can choose to play as either 'X' or 'O' and compete to form a winning sequence.
 •	The game ends when a player wins or when the board is filled, resulting in a draw.
 <br>
-3.	Data structure used in creating this :
-4.	<br>
+2.	Data structure used in creating this :
+<br>
 •	A 2D array, or two-dimensional array, is a fundamental data structure that organizes data in a grid-like fashion. Unlike a 1D array, which is a linear collection of elements, a 2D array allows data to be stored in rows and columns, creating a structured matrix.
-•	In the context of the "Super XO Game" project, a 2D array is employed to efficiently store and manage the game board, providing a systematic approach to tracking the game state and enabling easy access and manipulation of individual cells.
+<br>
+In the context of the "Super XO Game" project, a 2D array is employed to efficiently store and manage the game board, providing a systematic approach to tracking the game state and enabling easy access and manipulation of individual cells.
+<br>
 Super XO Game is a well-structured, educational, and fun DSA mini project that not only demonstrates strong coding and algorithmic skills but also provides an enjoyable experience for players. It showcases the practical application of data structures and algorithms in real-world scenarios, making it an excellent addition to the university's computer science program.
 
