@@ -8,8 +8,7 @@ If a move is played so that it is to win a small board by the rules of normal ti
 What is this project about?
 <br>
 The Super XO Game is a dynamic and engaging implementation of the classic Tic-Tac-Toe, which is developed using 2D array concept of Data Structures and Algorithm. Even though we are doing this for marks and our future, but still it was so fun and enjoyable doing this.
-<br>
-1.	Talking about the feature of the game : 
+<br>1.	Talking about the feature of the game : 
 •	The game features a standard 3x3 Tic-Tac-Toe grid where two players take turns.
 •	Players can choose to play as either 'X' or 'O' and compete to form a winning sequence.
 •	The game ends when a player wins or when the board is filled, resulting in a draw.
