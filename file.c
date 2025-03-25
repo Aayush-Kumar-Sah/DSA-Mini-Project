@@ -1,21 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <stdbool.h>
 
-char super[10][10] = {{'o'},
-                      {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
-                      {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
-                      {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
-                      {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
-                      {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
-                      {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
-                      {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
-                      {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
-                      {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'}};
+#define BOARD_SIZE 10  // Using 1-9 for actual boards
 
-char flag[10] = {'0','1','2','3','4','5','6','7','8','9'};
+char super[BOARD_SIZE][BOARD_SIZE] = {
+    {'o'},  // Unused index 0
+    {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},  // Board 1
+    {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},  // Board 2
+    {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},  // Board 3
+    {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},  // Board 4
+    {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},  // Board 5
+    {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},  // Board 6
+    {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},  // Board 7
+    {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'},  // Board 8
+    {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'}   // Board 9
+};
 
-void board()
+char flag[BOARD_SIZE] = {'0','1','2','3','4','5','6','7','8','9'};
+
+void clearScreen() {
+    system("cls");  // For Windows
+    // system("clear");  // For Linux/Mac
+}
+
+void drawBoard()
 {
 
     system("cls");
@@ -56,309 +65,188 @@ void board()
     printf("\n\n");
 }
 
-int smallBoardMove(int smallBoardChoice, char mark, int bigBoardChoice)
-{
-    if (smallBoardChoice == 1 && super[bigBoardChoice][1] == '1')
-    {
-        super[bigBoardChoice][1] = mark;
-        return 1;
-    }
-    else if (smallBoardChoice == 2 && super[bigBoardChoice][2] == '2')
-    {
-        super[bigBoardChoice][2] = mark;
-        return 2;
-    }
-    else if (smallBoardChoice == 3 && super[bigBoardChoice][3] == '3')
-    {
-        super[bigBoardChoice][3] = mark;
-        return 3;
-    }
-    else if (smallBoardChoice == 4 && super[bigBoardChoice][4] == '4')
-    {
-        super[bigBoardChoice][4] = mark;
-        return 4;
-    }
-    else if (smallBoardChoice == 5 && super[bigBoardChoice][5] == '5')
-    {
-        super[bigBoardChoice][5] = mark;
-        return 5;
-    }
-    else if (smallBoardChoice == 6 && super[bigBoardChoice][6] == '6')
-    {
-        super[bigBoardChoice][6] = mark;
-        return 6;
-    }
-    else if (smallBoardChoice == 7 && super[bigBoardChoice][7] == '7')
-    {
-        super[bigBoardChoice][7] = mark;
-        return 7;
-    }
-    else if (smallBoardChoice == 8 && super[bigBoardChoice][8] == '8')
-    {
-        super[bigBoardChoice][8] = mark;
-        return 8;
-    }
-    else if (smallBoardChoice == 9 && super[bigBoardChoice][9] == '9')
-    {
-        super[bigBoardChoice][9] = mark;
-        return 9;
-    }
-    else
-    {
-        printf("Invalid Move. Try Again");
-        printf("\nRe-enter the smallboardChoice:");
-        scanf("%d", &smallBoardChoice);
-        smallBoardMove(smallBoardChoice, mark, bigBoardChoice);
-    }
+
+bool isValidMove(int bigBoard, int smallBoard) {
+    return (bigBoard >= 1 && bigBoard <= 9) && 
+           (smallBoard >= 1 && smallBoard <= 9) &&
+           (super[bigBoard][smallBoard] == '0' + smallBoard);
 }
 
-// INITIAL BIG BOARD MOVE FUNCTION:-
-int ChoiceBigBoardMove(int bigBoardChoice, int smallBoardChoice, char mark)
-{
-    return smallBoardMove(smallBoardChoice, mark, bigBoardChoice);
+int makeMove(int bigBoard, int smallBoard, char mark) {
+    if (!isValidMove(bigBoard, smallBoard)) {
+        printf("Invalid Move. Try Again\n");
+        printf("Re-enter the small board choice (1-9): ");
+        scanf("%d", &smallBoard);
+        return makeMove(bigBoard, smallBoard, mark);
+    }
+    
+    super[bigBoard][smallBoard] = mark;
+    return smallBoard;
 }
 
-int BigBoardMove(int smallBoardChoice, char mark, int bigBoardChoice)
-{
-    return smallBoardMove(smallBoardChoice, mark, bigBoardChoice);
-}
-
-void setFlagX(int num)
-{
-    for (int j = 1; j <= 9; j++)
-    {
-        if (super[num][j] != 'X')
-        {
-            return;
+void checkAndUpdateBoardStatus(int boardNum, char mark) {
+    // Check all possible winning combinations
+    bool win = false;
+    
+    // Check rows
+    for (int i = 1; i <= 7; i += 3) {
+        if (super[boardNum][i] == super[boardNum][i+1] && 
+            super[boardNum][i+1] == super[boardNum][i+2]) {
+            win = true;
+            break;
         }
     }
-    flag[num] = 'X';
-}
-
-void setFlagO(int num)
-{
-    for (int j = 1; j <= 9; j++)
-    {
-        if (super[num][j] != 'O')
-        {
-            return;
+    
+    // Check columns
+    for (int i = 1; i <= 3; i++) {
+        if (super[boardNum][i] == super[boardNum][i+3] && 
+            super[boardNum][i+3] == super[boardNum][i+6]) {
+            win = true;
+            break;
         }
     }
-    flag[num] = 'O';
-}
-
-void setFlagT(int num)
-{
-    for (int j = 1; j <= 9; j++)
-    {
-        if (super[num][j] != 'T')
-        {
-            return;
+    
+    // Check diagonals
+    if ((super[boardNum][1] == super[boardNum][5] && super[boardNum][5] == super[boardNum][9]) ||
+        (super[boardNum][3] == super[boardNum][5] && super[boardNum][5] == super[boardNum][7])) {
+        win = true;
+    }
+    
+    if (win) {
+        // Fill the entire board with the winner's mark
+        for (int i = 1; i <= 9; i++) {
+            super[boardNum][i] = mark;
+        }
+        flag[boardNum] = mark;
+        return;
+    }
+    
+    // Check for tie
+    bool isTie = true;
+    for (int i = 1; i <= 9; i++) {
+        if (super[boardNum][i] == '0' + i) {
+            isTie = false;
+            break;
         }
     }
-    flag[num] = 'T';
-}
-
-char checkwin(int num, char mark)
-{
-    if (super[num][1] == super[num][2] && super[num][2] == super[num][3])
-    {
-        return mark;
-    }
-    else if (super[num][4] == super[num][5] && super[num][5] == super[num][6])
-    {
-        return mark;
-    }
-    else if (super[num][7] == super[num][8] && super[num][8] == super[num][9])
-    {
-        return mark;
-    }
-    else if (super[num][1] == super[num][5] && super[num][5] == super[num][9])
-    {
-        return mark;
-    }
-    else if (super[num][3] == super[num][5] && super[num][5] == super[num][7])
-    {
-        return mark;
-    }
-    else if (super[num][1] == super[num][4] && super[num][4] == super[num][7])
-    {
-        return mark;
-    }
-    else if (super[num][2] == super[num][5] && super[num][5] == super[num][8])
-    {
-        return mark;
-    }
-    else if (super[num][3] == super[num][6] && super[num][6] == super[num][9])
-    {
-        return mark;
-    }
-    else if (super[num][1] != '1' && super[num][2] != '2' && super[num][3] != '3' && super[num][4] != '4' && super[num][5] != '5' && super[num][6] != '6' && super[num][7] != '7' && super[num][8] != '8' && super[num][9] != '9')
-    {
-        return '0';
-    }
-    else
-    {
-        return '-';
+    
+    if (isTie) {
+        for (int i = 1; i <= 9; i++) {
+            super[boardNum][i] = 'T';
+        }
+        flag[boardNum] = 'T';
     }
 }
 
-void blockFill(int num, char item)
-{
-    for (int i = 1; i <= 9; i++)
-    {
-        super[num][i] = item;
+bool isBoardAvailable(int boardNum) {
+    return flag[boardNum] == '0' + boardNum;
+}
+
+int checkGlobalWin() {
+    // Check all possible winning combinations on the global board
+    for (int i = 1; i <= 7; i += 3) {
+        if (flag[i] == flag[i+1] && flag[i+1] == flag[i+2] && flag[i] != '0' + i) {
+            return 1;  // Win
+        }
     }
-}
-
-int bigWin()
-{
-    if (flag[1] == flag[2] && flag[2] == flag[3])
-        return 1;
-
-    else if (flag[4] == flag[5] && flag[5] == flag[6])
-        return 1;
-
-    else if (flag[7] == flag[8] && flag[8] == flag[9])
-        return 1;
-
-    else if (flag[1] == flag[4] && flag[4] == flag[7])
-        return 1;
-
-    else if (flag[2] == flag[5] && flag[5] == flag[8])
-        return 1;
-
-    else if (flag[3] == flag[6] && flag[6] == flag[9])
-        return 1;
-
-    else if (flag[1] == flag[5] && flag[5] == flag[9])
-        return 1;
-
-    else if (flag[3] == flag[5] && flag[5] == flag[7])
-        return 1;
-
-    else if (flag[1] != '1' && flag[2] != '2' && flag[3] != '3' && flag[4] != '4' && flag[5] != '5' && flag[6] != '6' && flag[7] != '7' && flag[8] != '8' && flag[9] != '9')
-
-        return 0;
-    else
-        return -1;
-}
-
-int restrictBigBoardMove(int num){
-    if(num==1 && flag[num]!='1')
-        return 1;
-    else if(num==2 && flag[num]!='2')
-        return 1;
-    else if(num==3 && flag[num]!='3')
-        return 1;
-    else if(num==4 && flag[num]!='4')
-        return 1;
-    else if(num==5 && flag[num]!='5')
-        return 1;
-    else if(num==6 && flag[num]!='6')
-        return 1;
-    else if(num==7 && flag[num]!='7')
-        return 1;
-    else if(num==8 && flag[num]!='8')
-        return 1;
-    else if(num==9 && flag[num]!='9')
-        return 1;
-    else
-        return 0;
-}
-
-int validatebigboardMove(int bigBoardChoice){
-    if(bigBoardChoice<1 || bigBoardChoice>9){
-        return 1;
+    
+    for (int i = 1; i <= 3; i++) {
+        if (flag[i] == flag[i+3] && flag[i+3] == flag[i+6] && flag[i] != '0' + i) {
+            return 1;  // Win
+        }
     }
-    return 0;
+    
+    if ((flag[1] == flag[5] && flag[5] == flag[9] && flag[1] != '1') ||
+        (flag[3] == flag[5] && flag[5] == flag[7] && flag[3] != '3')) {
+        return 1;  // Win
+    }
+    
+    // Check for global tie
+    bool isTie = true;
+    for (int i = 1; i <= 9; i++) {
+        if (flag[i] == '0' + i) {
+            isTie = false;
+            break;
+        }
+    }
+    
+    return isTie ? 0 : -1;  // 0 for tie, -1 for continue
 }
 
-int main()
-{
-    int player = 1, j = -1, bigBoardChoice, smallBoardChoice, temp;
+int main() {
+    int player = 1, gameStatus = -1;
+    int bigBoardChoice, smallBoardChoice, lastSmallBoard;
     char mark;
-    char i;
-
-    board();
-
-    player = (player % 2) ? 1 : 2;
-
-    // TAKING THE PLAYER CHOICES:-
+    
+    drawBoard();
+    
+    // Initial move
     printf("Player %d, Enter your choice:\n", player);
-    printf("Big Board Choice:");
+    printf("Big Board Choice (1-9): ");
     scanf("%d", &bigBoardChoice);
-    while(validatebigboardMove(bigBoardChoice)){
-        printf("\nInvalid BigBoardMove:");
-        printf("\nPlease re-enter bigboardMove:");
-        scanf("%d",&bigBoardChoice);
+    
+    while (bigBoardChoice < 1 || bigBoardChoice > 9) {
+        printf("Invalid choice. Please enter a number between 1 and 9: ");
+        scanf("%d", &bigBoardChoice);
     }
-    printf("Small Board choice:");
+    
+    printf("Small Board choice (1-9): ");
     scanf("%d", &smallBoardChoice);
-
+    
     mark = (player == 1) ? 'X' : 'O';
-
-    // INITIAL BIG BOARD MOVE BY PLAYER:-
-    bigBoardChoice = ChoiceBigBoardMove(bigBoardChoice, smallBoardChoice, mark);
-
-    player++;
-
-    do
-    {
-        if (j == 1)
-        {
-            blockFill(temp,mark);
-            printf("\nPlayer %d is the Winner", player-1);
-            break;
+    lastSmallBoard = makeMove(bigBoardChoice, smallBoardChoice, mark);
+    bigBoardChoice = lastSmallBoard;
+    player = 2;
+    
+    do {
+        drawBoard();
+        
+        // Check if the next board is available
+        if (!isBoardAvailable(bigBoardChoice)) {
+            printf("Board %d is already won/tied. You can choose any available board.\n", bigBoardChoice);
+            printf("Available boards: ");
+            for (int i = 1; i <= 9; i++) {
+                if (isBoardAvailable(i)) printf("%d ", i);
+            }
+            printf("\n");
+            
+            printf("Player %d, choose a big board (1-9): ", player);
+            scanf("%d", &bigBoardChoice);
+            
+            while (bigBoardChoice < 1 || bigBoardChoice > 9 || !isBoardAvailable(bigBoardChoice)) {
+                printf("Invalid choice. Please select an available board (1-9): ");
+                scanf("%d", &bigBoardChoice);
+            }
         }
-        else if (j == 0)
-        {
-            blockFill(temp,mark);
-            printf("Tie");
-            break;
-        }
-        else
-        {
-            board();
-            player = (player % 2) ? 1 : 2;
-            while(restrictBigBoardMove(bigBoardChoice)){
-                printf("\nAll the position in BigBoard %d is occupied",bigBoardChoice);
-                printf("\nPlayer %d can play any BigBoard which is not occupied",player);
-                printf("\nPlayer %d. Enter BigBoardChoice:");
-                scanf("%d",&bigBoardChoice);
-            }
-
-            printf("\nPlayer %d must play in box %d\n", player, bigBoardChoice);
-            temp = bigBoardChoice;
-            printf("Enter your Small Board Choice:");
-            scanf("%d", &smallBoardChoice);
-
-            mark = (player == 1) ? 'X' : 'O';
-
-            bigBoardChoice = BigBoardMove(smallBoardChoice, mark, bigBoardChoice);
-
-            i = checkwin(temp, mark);
-
-            if (i == 'X')
-            {
-                blockFill(temp, 'X');
-                setFlagX(temp);
-            }
-            else if (i == 'O')
-            {
-                blockFill(temp, 'O');
-                setFlagO(temp);
-            }
-            else if (i == '0')
-            {
-
-                blockFill(temp, 'T');
-                setFlagT(temp);
-            }
-
-            j = bigWin();
-
-            player++;
-        }
-    } while (1);
+        
+        printf("Player %d must play in board %d\n", player, bigBoardChoice);
+        printf("Enter your small board choice (1-9): ");
+        scanf("%d", &smallBoardChoice);
+        
+        mark = (player == 1) ? 'X' : 'O';
+        lastSmallBoard = makeMove(bigBoardChoice, smallBoardChoice, mark);
+        
+        // Check if the current small board is won/tied
+        checkAndUpdateBoardStatus(bigBoardChoice, mark);
+        
+        // Check global game status
+        gameStatus = checkGlobalWin();
+        
+        // Determine next board to play
+        bigBoardChoice = lastSmallBoard;
+        
+        // Switch player
+        player = (player == 1) ? 2 : 1;
+        
+    } while (gameStatus == -1);
+    
+    drawBoard();
+    
+    if (gameStatus == 1) {
+        printf("\nPlayer %d wins the game!\n", (player == 1) ? 2 : 1);
+    } else {
+        printf("\nThe game is a tie!\n");
+    }
+    
+    return 0;
 }
